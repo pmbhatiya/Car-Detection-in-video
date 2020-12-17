@@ -73,6 +73,7 @@ while success:
             color = colors[i]
             cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
             cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
+
     my_car=min(len(my_car_x),min(len(my_car_y),min(len(my_car_w),len(my_car_h))))
     print("Up To this frame No ",count_frame,"Number of unique Cars are :",my_car)
     cv2.imshow("Image", img)
