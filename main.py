@@ -1,4 +1,5 @@
 import cv2
+import os
 import numpy as np
 
 # Load Yolo
@@ -12,13 +13,18 @@ colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
 vidcap=cv2.VideoCapture('test_video.mp4')
 success,image=vidcap.read()
-count=0
+count_frame=0
+my_car_x=set()
+my_car_y=set()
+my_car_h=set()
+my_car_w=set()
+
 while success:
-    cv2.imwrite('frame/frame%d.jpg'%count,image)
+    cv2.imwrite('frame/frame%d.jpg'%count_frame,image)
     
 
 # Loading image
-    img = cv2.imread('frame/frame%d.jpg'%count)
+    img = cv2.imread('frame/frame%d.jpg'%count_frame)
     img = cv2.resize(img, None, fx=0.4, fy=0.4)
     height, width, channels = img.shape
 
@@ -52,30 +58,30 @@ while success:
                 boxes.append([x, y, w, h])
                 confidences.append(float(confidence))
                 class_ids.append(class_id)
-
-
-
-
-
+                
     indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
-
     font = cv2.FONT_HERSHEY_PLAIN
     for i in range(len(boxes)):
         if i in indexes:
             x, y, w, h = boxes[i]
             label = str(classes[class_ids[i]])
             if label=='car':
-                my_car+=1;
+                my_car_x.add(x)
+                my_car_y.add(y)
+                my_car_w.add(w)
+                my_car_h.add(h)
             color = colors[i]
             cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
             cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
-
-    print("NO of vehicle in frame",count, "are :",my_car)
+    my_car=min(len(my_car_x),min(len(my_car_y),min(len(my_car_w),len(my_car_h))))
+    print("Up To this frame No ",count_frame,"Number of unique Cars are :",my_car)
     cv2.imshow("Image", img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+    os.remove('frame/frame%d.jpg'%count_frame)
     success,image=vidcap.read()
-    count+=1
+    count_frame+=1
+   
 
 
 
